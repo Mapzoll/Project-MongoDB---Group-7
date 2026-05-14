@@ -1,0 +1,61 @@
+query searching 
+
+//0
+use("MembershipDB");
+db.getCollection('Member Gym').find({ umur: { $lt: 25 } });
+
+// 1
+use('MembershipDB');
+
+// Mencari member Laki-laki yang levelnya Gold
+db.getCollection('Member Gym').find({
+  gender: "Laki-laki",
+  status_member: "Gold"
+});
+
+// Mencari member yang berumur di bawah 20 ATAU di atas 40 (OR)
+db.getCollection('Member Gym').find({
+  $or: [
+    { umur: { $lt: 20 } },
+    { umur: { $gt: 40 } }
+  ]
+});
+
+//2
+use('MembershipDB');
+
+// Menghitung rata-rata umur seluruh member
+db.getCollection('Member Gym').aggregate([
+  {
+    $group: {
+      _id: null,
+      rataRataUmur: { $avg: "$umur" },
+      totalMember: { $sum: 1 }
+    }
+  }
+]);
+
+//3
+use('MembershipDB');
+
+db.getCollection('Transaksi').aggregate([
+  {
+    $lookup: {
+      from: "Member Gym",       // Koleksi asal
+      localField: "member_id",  // Field di koleksi Transaksi
+      foreignField: "_id",      // Field di koleksi Member Gym
+      as: "detail_member"       // Nama output field baru
+    }
+  },
+  { $unwind: "$detail_member" } // Memecah array hasil lookup agar rapi
+]);
+
+//4 
+use('MembershipDB');
+
+// Urutkan berdasarkan kehadiran terbanyak (-1 = Descending) dan ambil 3 teratas
+db.getCollection('Member Gym')
+  .find()
+  .sort({ kehadiran: -1 })
+  .limit(3);
+
