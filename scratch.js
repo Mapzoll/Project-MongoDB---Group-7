@@ -1,0 +1,1 @@
+const { MongoClient } = require('mongodb'); require('dotenv').config(); async function run() { const client = new MongoClient(process.env.MONGODB_URI); await client.connect(); const db = client.db('MembershipDB'); await db.collection('Member Gym').updateMany({}, { $set: { kehadiran: 0 } }); await client.close(); } run();

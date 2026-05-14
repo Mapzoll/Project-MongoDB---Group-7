@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Gym Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>Gym Member Management</h2>
+        </div>
+        <ul class="menu">
+            <li class="active" onclick="switchTab('dashboard', this)">Dashboard</li>
+            <li onclick="switchTab('member', this)">Data Member</li>
+            <li onclick="switchTab('kategori', this)">Kategori Alat</li>
+            <li onclick="switchTab('transaksi', this)">Riwayat Transaksi</li>
+        </ul>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3 id="confirm-modal-title" style="margin-bottom: 12px; color: #f1f5f9;">Konfirmasi Hapus</h3>
+            <p id="confirm-modal-text" style="margin-bottom: 24px; color: #cbd5e1;">Yakin ingin menghapus data ini?</p>
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button class="btn-cancel" onclick="closeConfirmModal()">Batal</button>
+                <button class="btn-danger" onclick="executeDelete()">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h1 id="page-title">Dashboard</h1>
+        </div>
+
+        <div class="content">
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="page active">
+                <div class="welcome-banner">
+                    <h2>Selamat Datang di Gym Admin </h2>
+                    <p>Pusat kontrol untuk mengelola seluruh data member, peralatan gym, dan riwayat transaksi dengan
+                        mudah.</p>
+                </div>
+                <div class="cards">
+                    <div class="card">
+                        <div class="card-icon">👥</div>
+                        <div class="card-info">
+                            <h3>Total Member</h3>
+                            <p id="stat-member">0</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">🏋️</div>
+                        <div class="card-info">
+                            <h3>Kategori Alat</h3>
+                            <p id="stat-kategori">0</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💳</div>
+                        <div class="card-info">
+                            <h3>Total Transaksi</h3>
+                            <p id="stat-transaksi">0</p>
+                        </div>
+                    </div>
+                    <div class="card wide">
+                        <div class="card-icon" style="font-size: 50px;">👑</div>
+                        <div class="card-info" style="flex: 1;">
+                            <h3>Member Paling Aktif</h3>
+                            <p id="stat-teraktif" style="font-size: 32px; color: #facc15;">-</p>
+                            <span style="color: #94a3b8; font-size: 14px; margin-top: 8px; display: block;">Peraih
+                                jumlah presensi tertinggi saat ini</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MEMBER GYM -->
+            <div id="member" class="page">
+                <div class="panel">
+                    <h2>Tambah Member</h2>
+                    <div class="form-grid">
+                        <input id="inp-nama" type="text" placeholder="Nama Lengkap" />
+                        <input id="inp-domisili" type="text" placeholder="Domisili" />
+                        <input id="inp-umur" type="number" placeholder="Umur" />
+                        <select id="inp-gender">
+                            <option value="">Pilih Gender...</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                        <select id="inp-status">
+                            <option value="">Status Pekerjaan...</option>
+                            <option value="Pekerja">Pekerja</option>
+                            <option value="Pelajar">Pelajar</option>
+                        </select>
+                        <select id="inp-level">
+                            <option value="">Level Member...</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Standard">Standard</option>
+                        </select>
+                    </div>
+                    <button onclick="tambahMember()">Simpan Member</button>
+                </div>
+                <div class="panel">
+                    <h2>Daftar Member</h2>
+
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 16px;">
+                        <select id="filter-level" onchange="applyMemberFilter()">
+                            <option value="">Filter Level (Semua)</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Standard">Standard</option>
+                        </select>
+                        <select id="filter-gender" onchange="applyMemberFilter()">
+                            <option value="">Filter Gender (Semua)</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                        <input id="filter-nama" type="text" placeholder="Cari Nama..." oninput="applyMemberFilter()" />
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th onclick="sortMembers('nama')" style="cursor:pointer" title="Klik untuk mengurutkan">
+                                    Nama ↕</th>
+                                <th onclick="sortMembers('domisili')" style="cursor:pointer"
+                                    title="Klik untuk mengurutkan">Domisili ↕</th>
+                                <th onclick="sortMembers('umur')" style="cursor:pointer" title="Klik untuk mengurutkan">
+                                    Umur ↕</th>
+                                <th onclick="sortMembers('gender')" style="cursor:pointer"
+                                    title="Klik untuk mengurutkan">Gender ↕</th>
+                                <th onclick="sortMembers('status')" style="cursor:pointer"
+                                    title="Klik untuk mengurutkan">Status ↕</th>
+                                <th onclick="sortMembers('status_member')" style="cursor:pointer"
+                                    title="Klik untuk mengurutkan">Level ↕</th>
+                                <th onclick="sortMembers('kehadiran')" style="cursor:pointer"
+                                    title="Klik untuk mengurutkan">Kehadiran ↕</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-member"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- KATEGORI ALAT -->
+            <div id="kategori" class="page">
+                <div class="panel">
+                    <h2>Tambah Kategori Alat</h2>
+                    <div class="form-grid">
+                        <input id="inp-kat-nama" type="text" placeholder="Nama Kategori (Contoh: Cardio)" />
+                        <select id="inp-kat-kegunaan">
+                            <option value="">Pilih Kegunaan...</option>
+                            <option value="Membakar Lemak">Membakar Lemak (Cardio)</option>
+                            <option value="Membangun Otot">Membangun Otot (Strength)</option>
+                            <option value="Peregangan">Peregangan (Flexibility)</option>
+                            <option value="Pemulihan">Pemulihan (Recovery)</option>
+                        </select>
+                        <input id="inp-kat-alat" type="text" placeholder="Daftar Alat (Pisahkan dengan koma)" />
+                    </div>
+                    <button onclick="tambahKategori()">Simpan Kategori</button>
+                </div>
+                <div class="panel">
+                    <h2>Daftar Kategori Alat</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Kategori</th>
+                                <th>Kegunaan</th>
+                                <th>Daftar Alat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-kategori"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TRANSAKSI GYM -->
+            <div id="transaksi" class="page">
+                <div class="panel">
+                    <h2>Catat Presensi (Transaksi)</h2>
+                    <div class="form-grid">
+                        <select id="inp-trx-member">
+                            <option value="">Pilih Member...</option>
+                        </select>
+                        <input id="inp-trx-date" type="datetime-local" />
+                        <select id="inp-trx-alat">
+                            <option value="">Pilih Alat...</option>
+                        </select>
+                    </div>
+                    <button onclick="tambahTransaksi()">Simpan Presensi</button>
+                </div>
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2 style="margin: 0;">Riwayat Presensi</h2>
+                        <button class="btn-danger" style="padding: 8px 16px; border-radius: 6px; font-size: 14px;" onclick="confirmDeleteAllTransactions()">Hapus Semua</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nama Member</th>
+                                <th>Waktu Presensi</th>
+                                <th>Alat Dipakai</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tb-transaksi"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+
+        let allMembers = [];
+        let sortDirection = 1;
+
+        // Custom Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.className = toast.className.replace('show', '');
+            }, 3000);
+        }
+
+        // Navigasi Tab
+        function switchTab(targetId, el) {
+            document.querySelectorAll('.menu li').forEach(li => li.classList.remove('active'));
+            el.classList.add('active');
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+
+            document.getElementById('page-title').innerText = el.innerText;
+            loadData();
+        }
+
+        async function loadData() {
+            try {
+                // Fetch Data
+                const resM = await fetch(`${API_URL}/members`); const mem = await resM.json();
+                allMembers = mem;
+
+                // Update dropdown transaksi
+                const trxMemberSelect = document.getElementById('inp-trx-member');
+                trxMemberSelect.innerHTML = '<option value="">Pilih Member...</option>';
+                allMembers.forEach(m => {
+                    trxMemberSelect.innerHTML += `<option value="${m._id}">${m.nama} (${m.status_member})</option>`;
+                });
+
+                const resK = await fetch(`${API_URL}/kategori`); const kat = await resK.json();
+
+                // Update dropdown alat dari Kategori
+                const trxAlatSelect = document.getElementById('inp-trx-alat');
+                trxAlatSelect.innerHTML = '<option value="">Pilih Alat...</option>';
+                let allTools = [];
+                kat.forEach(k => {
+                    if (Array.isArray(k.daftar_alat)) {
+                        allTools = allTools.concat(k.daftar_alat);
+                    } else if (typeof k.daftar_alat === 'string') {
+                        allTools = allTools.concat(k.daftar_alat.split(','));
+                    }
+                });
+                // Hapus duplikat
+                allTools = [...new Set(allTools.map(t => t.trim()).filter(t => t))];
+                allTools.forEach(tool => {
+                    trxAlatSelect.innerHTML += `<option value="${tool}">${tool}</option>`;
+                });
+
+                const resT = await fetch(`${API_URL}/transactions`); const trx = await resT.json();
+
+                // Update Dashboard Stats
+                document.getElementById('stat-member').innerText = mem.length || 0;
+                document.getElementById('stat-kategori').innerText = kat.length || 0;
+                document.getElementById('stat-transaksi').innerText = trx.length || 0;
+
+                // Hitung Member Paling Aktif
+                let teraktifName = '-';
+                if (mem && mem.length > 0) {
+                    let topMember = mem[0];
+                    for (let i = 1; i < mem.length; i++) {
+                        let k = mem[i].kehadiran || 0;
+                        let kTop = topMember.kehadiran || 0;
+                        if (k > kTop) topMember = mem[i];
+                    }
+                    if ((topMember.kehadiran || 0) > 0) {
+                        teraktifName = `${topMember.nama} (${topMember.kehadiran}x)`;
+                    } else {
+                        teraktifName = 'Belum Ada';
+                    }
+                }
+                document.getElementById('stat-teraktif').innerText = teraktifName;
+
+                // Render Tables
+                applyMemberFilter();
+                renderTable('tb-kategori', kat, ['nama_kategori', 'kegunaan', 'daftar_alat'], 'kategori');
+                renderTable('tb-transaksi', trx, ['member_id', 'tgl_transaksi', 'alat_dipakai'], 'transactions');
+
+            } catch (e) { console.error(e); }
+        }
+
+        // Filter & Sort Logic
+        function applyMemberFilter() {
+            const level = document.getElementById('filter-level').value;
+            const gender = document.getElementById('filter-gender').value;
+            const nama = document.getElementById('filter-nama').value.toLowerCase();
+
+            const filtered = allMembers.filter(m => {
+                let match = true;
+                if (level && m.status_member !== level) match = false;
+                if (gender && m.gender !== gender) match = false;
+                if (nama && !m.nama.toLowerCase().includes(nama)) match = false;
+                return match;
+            });
+            renderTable('tb-member', filtered, ['nama', 'domisili', 'umur', 'gender', 'status', 'status_member', 'kehadiran'], 'members');
+        }
+
+        function sortMembers(key) {
+            sortDirection *= -1; // toggle asc/desc
+            allMembers.sort((a, b) => {
+                let valA = a[key], valB = b[key];
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+
+                if (valA < valB) return -1 * sortDirection;
+                if (valA > valB) return 1 * sortDirection;
+                return 0;
+            });
+            applyMemberFilter();
+        }
+
+        function renderTable(tbId, data, cols, endpoint) {
+            const tb = document.getElementById(tbId);
+            tb.innerHTML = '';
+            if (!data || data.length === 0) {
+                tb.innerHTML = `<tr><td colspan="${cols.length + 1}" class="empty">Belum ada data</td></tr>`;
+                return;
+            }
+            data.forEach(item => {
+                let tr = '<tr>';
+                cols.forEach(col => {
+                    let val = item[col];
+                    if (col === 'member_id') {
+                        const m = allMembers.find(x => x._id === val);
+                        if (m) val = m.nama;
+                    }
+                    if (val === undefined && col === 'kehadiran') val = 0;
+                    if (Array.isArray(val)) val = val.join(', ');
+                    if (col === 'tgl_transaksi') val = new Date(val).toLocaleString('id-ID');
+                    tr += `<td>${val}</td>`;
+                });
+                tr += `<td><button class="btn-danger" onclick="hapus('${endpoint}', '${item._id}')">Hapus</button></td></tr>`;
+                tb.innerHTML += tr;
+            });
+        }
+
+        let deleteAction = null;
+        function hapus(endpoint, id) {
+            deleteAction = { type: 'single', endpoint, id };
+            document.getElementById('confirm-modal-title').innerText = "Konfirmasi Hapus";
+            document.getElementById('confirm-modal-text').innerText = "Yakin ingin menghapus data ini?";
+            document.getElementById('confirm-modal').classList.add('show');
+        }
+
+        function confirmDeleteAllTransactions() {
+            deleteAction = { type: 'all_transactions' };
+            document.getElementById('confirm-modal-title').innerText = "Konfirmasi Hapus Semua";
+            document.getElementById('confirm-modal-text').innerText = "Yakin ingin menghapus SEMUA riwayat transaksi? Ini juga akan mereset kehadiran seluruh member menjadi 0.";
+            document.getElementById('confirm-modal').classList.add('show');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.remove('show');
+        }
+
+        async function executeDelete() {
+            if (!deleteAction) return;
+            closeConfirmModal();
+            try {
+                if (deleteAction.type === 'all_transactions') {
+                    const res = await fetch(`${API_URL}/transactions`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('API Error');
+                    loadData();
+                    showToast('Semua transaksi berhasil dihapus!', 'error');
+                } else {
+                    const res = await fetch(`${API_URL}/${deleteAction.endpoint}/${deleteAction.id}`, { method: 'DELETE' });
+                    if (!res.ok) throw new Error('API Error');
+                    loadData();
+                    showToast('Data berhasil dihapus!', 'error'); // Hapus menggunakan warna merah
+                }
+            } catch (e) { showToast('Gagal menghapus data', 'error'); }
+        }
+
+        // Action Buttons
+        async function tambahMember() {
+            const payload = {
+                nama: document.getElementById('inp-nama').value,
+                domisili: document.getElementById('inp-domisili').value,
+                umur: parseInt(document.getElementById('inp-umur').value),
+                gender: document.getElementById('inp-gender').value,
+                status: document.getElementById('inp-status').value,
+                status_member: document.getElementById('inp-level').value
+            };
+            if (!payload.nama || !payload.status_member) return showToast('Lengkapi data member!', 'error');
+            try {
+                await fetch(`${API_URL}/members`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                loadData(); showToast('Member berhasil ditambah!', 'success');
+            } catch (e) { showToast('Gagal menambah member', 'error'); }
+        }
+
+        async function tambahKategori() {
+            const payload = {
+                nama_kategori: document.getElementById('inp-kat-nama').value,
+                kegunaan: document.getElementById('inp-kat-kegunaan').value,
+                daftar_alat: document.getElementById('inp-kat-alat').value
+            };
+            if (!payload.nama_kategori || !payload.kegunaan) return showToast('Lengkapi data kategori dan kegunaan!', 'error');
+            try {
+                await fetch(`${API_URL}/kategori`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                loadData(); showToast('Kategori berhasil ditambah!', 'success');
+            } catch (e) { showToast('Gagal menambah kategori', 'error'); }
+        }
+
+        async function tambahTransaksi() {
+            const payload = {
+                member_id: document.getElementById('inp-trx-member').value,
+                tgl_transaksi: document.getElementById('inp-trx-date').value,
+                alat_dipakai: document.getElementById('inp-trx-alat').value
+            };
+            if (!payload.member_id || !payload.alat_dipakai) return showToast('Pilih member dan alat!', 'error');
+            try {
+                await fetch(`${API_URL}/transactions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                loadData(); showToast('Presensi berhasil disimpan!', 'success');
+            } catch (e) { showToast('Gagal menyimpan presensi', 'error'); }
+        }
+
+        // Initialize Data on Load
+        loadData();
+    </script>
+</body>
+
+</html>
