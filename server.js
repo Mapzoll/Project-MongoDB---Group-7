@@ -143,11 +143,10 @@ app.delete('/api/transactions', async (req, res) => {
 
 // Jalankan Web Server
 app.listen(port, () => {
-    console.log('\n=======================================');
-    console.log(`🚀 WEB SERVER AKTIF DI PORT ${port}`);
-    console.log('=======================================');
-    console.log('Untuk melihat tampilan website HTML/CSS, buka link berikut di browser:');
-    console.log(`👉 http://localhost:${port}`);
-    console.log('Semua proses CRUD di website akan otomatis tersimpan di MongoDB Atlas!');
-    console.log('Tekan Ctrl + C untuk mematikan server.');
+    console.log('========================================');
+    console.log(`>>>> WEB SERVER AKTIF DI PORT ${port} <<<<`);
+    console.log('Untuk melihat tampilan website di browser:');
+    console.log(`>>>> http://localhost:${port} <<<<`);
+    console.log('Semua proses di website akan otomatis tersimpan di MongoDB Atlas!');
+    console.log('Tekan Ctrl + C untuk mematikan server!!');
 });
