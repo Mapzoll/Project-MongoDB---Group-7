@@ -256,7 +256,6 @@
                 const resM = await fetch(`${API_URL}/members`); const mem = await resM.json();
                 allMembers = mem;
 
-                // Update dropdown transaksi
                 const trxMemberSelect = document.getElementById('inp-trx-member');
                 trxMemberSelect.innerHTML = '<option value="">Pilih Member...</option>';
                 allMembers.forEach(m => {
@@ -265,7 +264,6 @@
 
                 const resK = await fetch(`${API_URL}/kategori`); const kat = await resK.json();
 
-                // Update dropdown alat dari Kategori
                 const trxAlatSelect = document.getElementById('inp-trx-alat');
                 trxAlatSelect.innerHTML = '<option value="">Pilih Alat...</option>';
                 let allTools = [];
@@ -331,7 +329,7 @@
         }
 
         function sortMembers(key) {
-            sortDirection *= -1; // toggle asc/desc
+            sortDirection *= -1; // toggle filter
             allMembers.sort((a, b) => {
                 let valA = a[key], valB = b[key];
                 if (typeof valA === 'string') valA = valA.toLowerCase();
@@ -401,7 +399,7 @@
                     const res = await fetch(`${API_URL}/${deleteAction.endpoint}/${deleteAction.id}`, { method: 'DELETE' });
                     if (!res.ok) throw new Error('API Error');
                     loadData();
-                    showToast('Data berhasil dihapus!', 'error'); // Hapus menggunakan warna merah
+                    showToast('Data berhasil dihapus!', 'error'); 
                 }
             } catch (e) { showToast('Gagal menghapus data', 'error'); }
         }
@@ -449,7 +447,6 @@
             } catch (e) { showToast('Gagal menyimpan presensi', 'error'); }
         }
 
-        // Initialize Data on Load
         loadData();
     </script>
 </body>
