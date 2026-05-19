@@ -17,7 +17,6 @@ const pm = new ProductModel();
 const km = new KategoriModel();
 const tm = new TransactionModel();
 
-//  MEMBER GYM 
 app.get('/api/members', async (req, res) => {
     try {
         const data = await pm.findAll();
@@ -47,7 +46,6 @@ app.delete('/api/members/:id', async (req, res) => {
     }
 });
 
-//  KATEGORI ALAT 
 app.get('/api/kategori', async (req, res) => {
     try {
         const data = await km.findAll();
@@ -92,7 +90,6 @@ app.delete('/api/kategori/:id', async (req, res) => {
     }
 });
 
-//  TRANSACTION GYM 
 app.get('/api/transactions', async (req, res) => {
     try {
         const data = await tm.findAll();
@@ -105,7 +102,6 @@ app.get('/api/transactions', async (req, res) => {
 app.post('/api/transactions', async (req, res) => {
     try {
         const { member_id, tgl_transaksi, alat_dipakai } = req.body;
-        // Konversi string yang dipisah koma menjadi array
         const alatArray = alat_dipakai.split(',').map(s => s.trim());
         await tm.insertOne(member_id, tgl_transaksi, alatArray);
         await pm.incrementKehadiran(member_id);
@@ -141,7 +137,7 @@ app.delete('/api/transactions', async (req, res) => {
     }
 });
 
-// Jalankan Web Server
+// Web Server
 app.listen(port, () => {
     console.log('========================================');
     console.log(`>>>> WEB SERVER AKTIF DI PORT ${port} <<<<`);
