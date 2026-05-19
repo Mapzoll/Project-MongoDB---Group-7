@@ -304,7 +304,6 @@
                 }
                 document.getElementById('stat-teraktif').innerText = teraktifName;
 
-                // Render Tables
                 applyMemberFilter();
                 renderTable('tb-kategori', kat, ['nama_kategori', 'kegunaan', 'daftar_alat'], 'kategori');
                 renderTable('tb-transaksi', trx, ['member_id', 'tgl_transaksi', 'alat_dipakai'], 'transactions');
@@ -327,9 +326,10 @@
             });
             renderTable('tb-member', filtered, ['nama', 'domisili', 'umur', 'gender', 'status', 'status_member', 'kehadiran'], 'members');
         }
-
+        
+        // toggle filter
         function sortMembers(key) {
-            sortDirection *= -1; // toggle filter
+            sortDirection *= -1; 
             allMembers.sort((a, b) => {
                 let valA = a[key], valB = b[key];
                 if (typeof valA === 'string') valA = valA.toLowerCase();
