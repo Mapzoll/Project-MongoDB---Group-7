@@ -7,10 +7,7 @@ async function main() {
     const dbManager = new Database();
 
     try {
-        // 1. Hubungkan ke database sekali saja di awal
         await dbManager.connect('MembershipDB');
-
-        // 2. Buat instance menu sekali saja (di dalam menu.js sudah otomatis buat productmodel)
         const m = new menu();
 
         while (true) {
