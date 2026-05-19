@@ -65,7 +65,7 @@ app.post('/api/kategori', async (req, res) => {
             let newAlat = existing.daftar_alat || [];
             if (!Array.isArray(newAlat)) newAlat = [newAlat];
             newAlat = newAlat.concat(alatArray);
-            newAlat = [...new Set(newAlat)]; // Hapus duplikat
+            newAlat = [...new Set(newAlat)]; 
             
             const finalKegunaan = kegunaan || existing.kegunaan || '-';
             await km.db.updateOne({ _id: existing._id }, { $set: { daftar_alat: newAlat, kegunaan: finalKegunaan } });
